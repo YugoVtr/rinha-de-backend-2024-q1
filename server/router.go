@@ -39,13 +39,13 @@ func (app App) Transacoes(response http.ResponseWriter, request *http.Request) {
 		http.Error(response, "dados inválidos", http.StatusBadRequest)
 		return
 	}
-	TransacaoResposta, err := app.Cliente.Transacao(transacao)
+	conta, err := app.Cliente.Transacao(transacao)
 	if err != nil {
 		http.Error(response, err.Error(), http.StatusUnprocessableEntity)
 		return
 	}
 	response.WriteHeader(http.StatusOK)
-	if err := json.NewEncoder(response).Encode(TransacaoResposta); err != nil {
+	if err := json.NewEncoder(response).Encode(map[string]any{"limite": conta.Limite, "saldo": conta.Saldo}); err != nil {
 		http.Error(response, err.Error(), http.StatusInternalServerError)
 		return
 	}

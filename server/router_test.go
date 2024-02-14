@@ -88,8 +88,8 @@ func (client) Transacao(t entity.Transacao) (entity.Conta, error) {
 	return entity.Conta{}, nil
 }
 
-func (c client) Extrato(id int64) (entity.ExtratoResponse, error) {
-	extrato := entity.ExtratoResponse{UltimasTransacoes: []entity.Transacao{}}
+func (c client) Extrato(id int64) (entity.Extrato, error) {
+	extrato := entity.Extrato{UltimasTransacoes: []entity.Transacao{}}
 	if !c.Existe(id) {
 		return extrato, fmt.Errorf("cliente não encontrado")
 	}

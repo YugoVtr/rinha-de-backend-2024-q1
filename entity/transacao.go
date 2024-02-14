@@ -1,5 +1,7 @@
 package entity
 
+import "errors"
+
 var TiposValidosTransacao = map[string]bool{
 	"c": true,
 	"d": true,
@@ -18,6 +20,21 @@ func (t Transacao) Validar() bool {
 }
 
 type Conta struct {
-	Limite uint64 `json:"limite"`
-	Saldo  int64  `json:"saldo"`
+	ClienteID   int64  `json:"cliente_id,omitempty"`
+	Limite      uint64 `json:"limite"`
+	Saldo       int64  `json:"total"`
+	DataExtrato string `json:"data_extrato,omitempty"`
+}
+
+func (c Conta) Exec(transacao Transacao) (Conta, error) {
+	if transacao.Tipo == "d" {
+		if c.Saldo-int64(transacao.Valor) < int64(c.Limite)*(-1) {
+			return c, errors.New("limite insuficiente")
+		}
+		c.Saldo -= int64(transacao.Valor)
+		return c, nil
+	}
+
+	c.Saldo += int64(transacao.Valor)
+	return c, nil
 }
