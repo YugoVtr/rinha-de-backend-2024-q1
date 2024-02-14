@@ -4,6 +4,8 @@
 
 GOCMD=go
 GOTEST=$(GOCMD) test
+DOCKER=docker
+BUILDX=$(DOCKER) buildx
 PROJECT_NAME := $(shell basename "$(PWD)")
 BINARY_NAME?=$(PROJECT_NAME)
 BIN_DIR?=bin
@@ -37,6 +39,9 @@ test: ## Run the tests of the project
 coverage: ## Run the tests of the project and export the coverage
 	$(GOTEST) -cover -covermode=count -coverprofile=profile.cov ./...
 	$(GOCMD) tool cover -func profile.cov
+
+release:
+	$(BUILDX) build -t yugovtr/$(PROJECT_NAME):latest --push .
 
 ## Help:
 help: ## Show this help.
