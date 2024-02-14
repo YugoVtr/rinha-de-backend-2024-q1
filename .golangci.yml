@@ -50,6 +50,8 @@ run:
   timeout: 5m
 
 linters-settings:
+  misspell:
+    mode: restricted
   wrapcheck:
     # See https://github.com/tomarrell/wrapcheck#configuration for more information.
     ignoreSigs:
