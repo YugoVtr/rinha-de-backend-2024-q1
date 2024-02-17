@@ -4,11 +4,14 @@ import (
 	"database/sql"
 	"fmt"
 	"os"
+	"time"
 
 	_ "github.com/lib/pq" // postgres driver
 )
 
-func ConnectToPostgres() (*sql.DB, error) {
+func ConnectToPostgres(log func(string, ...any)) (*sql.DB, error) {
+	log(`Connecting to Postgres...`)
+	defer log(`Connecting to Postgres...(done)`)
 	host := os.Getenv("DB_HOSTNAME")
 	if host == "" {
 		host = "localhost"
@@ -18,7 +21,14 @@ func ConnectToPostgres() (*sql.DB, error) {
 	if err != nil {
 		return nil, fmt.Errorf("open %w", err)
 	}
-	if err := database.Ping(); err != nil {
+	var pingErr error
+	for i := 0; ; i++ {
+		if pingErr = database.Ping(); pingErr == nil {
+			break
+		}
+		time.Sleep(time.Second * time.Duration(i))
+	}
+	if pingErr != nil {
 		return nil, fmt.Errorf("ping %w", err)
 	}
 	return database, nil

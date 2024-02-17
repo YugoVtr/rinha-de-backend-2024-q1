@@ -7,6 +7,7 @@ import (
 
 	"github.com/gorilla/mux"
 	"github.com/yugovtr/rinha-de-backend-2024-q1/entity"
+	"github.com/yugovtr/rinha-de-backend-2024-q1/server/log"
 )
 
 type App struct {
@@ -19,6 +20,7 @@ func Serve(c Cliente) *mux.Router {
 	clienteRouter := router.PathPrefix("/clientes/{id:[0-9]+}").Subrouter()
 	clienteRouter.HandleFunc("/transacoes", app.Transacoes).Methods("POST")
 	clienteRouter.HandleFunc("/extrato", app.Extrato).Methods("GET")
+	router.Use(log.LoggingMiddleware)
 	return router
 }
 

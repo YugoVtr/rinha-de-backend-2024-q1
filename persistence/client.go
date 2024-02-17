@@ -9,6 +9,8 @@ import (
 	"github.com/yugovtr/rinha-de-backend-2024-q1/entity"
 )
 
+var cache = map[int64]bool{}
+
 type Cliente struct {
 	*sql.DB
 }
@@ -17,10 +19,13 @@ func NewCliente(db *sql.DB) *Cliente {
 	return &Cliente{db}
 }
 
-func (c *Cliente) Existe(id int64) bool {
-	var exists bool
+func (c *Cliente) Existe(clienteID int64) (exists bool) {
+	if v, ok := cache[clienteID]; ok {
+		return v
+	}
 	query := `SELECT EXISTS(SELECT 1 FROM contas WHERE cliente_id=$1)`
-	_ = c.DB.QueryRow(query, id).Scan(&exists)
+	_ = c.DB.QueryRow(query, clienteID).Scan(&exists)
+	cache[clienteID] = exists
 	return exists
 }
 
@@ -62,18 +67,21 @@ func (c *Cliente) Transacao(transacao entity.Transacao) (conta entity.Conta, err
 	return conta, nil
 }
 
-func (c *Cliente) Extrato(id int64) (entity.Extrato, error) {
+func (c *Cliente) Extrato(clienteID int64) (entity.Extrato, error) {
 	extrato := entity.Extrato{UltimasTransacoes: []entity.Transacao{}}
 	query := `SELECT total, limite FROM contas WHERE cliente_id=$1`
-	if err := c.DB.QueryRow(query, id).Scan(&extrato.Saldo.Saldo, &extrato.Saldo.Limite); err != nil {
+	if err := c.DB.QueryRow(query, clienteID).Scan(&extrato.Saldo.Saldo, &extrato.Saldo.Limite); err != nil {
 		return extrato, fmt.Errorf("conta não encontrada %w", err)
 	}
 	extrato.Saldo.DataExtrato = time.Now().Local().Format(time.RFC3339Nano)
 
 	query = `SELECT valor, tipo, descricao, realizado_em FROM transacoes WHERE conta_id=$1 ORDER BY realizado_em DESC LIMIT 10`
-	rows, err := c.DB.Query(query, id)
+	rows, err := c.DB.Query(query, clienteID)
 	if err != nil {
-		return extrato, fmt.Errorf("erro ao buscar transações %w", err)
+		return extrato, fmt.Errorf("erro na consulta ao buscar transações %w", err)
+	}
+	if rows.Err() != nil {
+		return extrato, fmt.Errorf("erro no resultado ao buscar transações %w", rows.Err())
 	}
 	defer rows.Close()
 

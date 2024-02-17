@@ -43,6 +43,9 @@ coverage: ## Run the tests of the project and export the coverage
 release:
 	$(BUILDX) build -t yugovtr/$(PROJECT_NAME):latest --push .
 
+integration-test:
+	./scripts/integration-test.sh
+
 ## Help:
 help: ## Show this help.
 	@echo ''
