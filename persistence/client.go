@@ -43,6 +43,9 @@ func (c *Cliente) Transacao(transacao entity.Transacao) (conta entity.Conta, err
 		}
 		if commitErr := trasaction.Commit(); commitErr != nil {
 			err = errors.Join(err, commitErr)
+			if txErr := trasaction.Rollback(); txErr != nil {
+				err = errors.Join(err, txErr)
+			}
 		}
 	}()
 
@@ -60,11 +63,11 @@ func (c *Cliente) Transacao(transacao entity.Transacao) (conta entity.Conta, err
 		return novaConta, fmt.Errorf("erro ao atualizar saldo %w", err)
 	}
 
-	query = `INSERT INTO transacoes (conta_id, valor, tipo, descricao, realizado_em) VALUES ($1, $2, $3, $4, $5)`
+	query = `INSERT INTO transacoes (cliente_id, valor, tipo, descricao, realizado_em) VALUES ($1, $2, $3, $4, $5)`
 	if _, err = trasaction.Exec(query, transacao.ClienteID, transacao.Valor, transacao.Tipo, transacao.Descricao, time.Now()); err != nil {
 		return novaConta, fmt.Errorf("erro ao inserir transação %w", err)
 	}
-	return conta, nil
+	return novaConta, nil
 }
 
 func (c *Cliente) Extrato(clienteID int64) (entity.Extrato, error) {
@@ -75,7 +78,7 @@ func (c *Cliente) Extrato(clienteID int64) (entity.Extrato, error) {
 	}
 	extrato.Saldo.DataExtrato = time.Now().Local().Format(time.RFC3339Nano)
 
-	query = `SELECT valor, tipo, descricao, realizado_em FROM transacoes WHERE conta_id=$1 ORDER BY realizado_em DESC LIMIT 10`
+	query = `SELECT valor, tipo, descricao, realizado_em FROM transacoes WHERE cliente_id=$1 ORDER BY realizado_em DESC LIMIT 10`
 	rows, err := c.DB.Query(query, clienteID)
 	if err != nil {
 		return extrato, fmt.Errorf("erro na consulta ao buscar transações %w", err)
