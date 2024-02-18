@@ -49,6 +49,9 @@ integration-test:
 load-test:
 	./scripts/load-test.sh
 
+restart:
+	./scripts/restart.sh
+
 ## Help:
 help: ## Show this help.
 	@echo ''

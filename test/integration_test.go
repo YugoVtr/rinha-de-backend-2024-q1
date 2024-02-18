@@ -11,6 +11,10 @@ import (
 
 const serviceURL = "http://0.0.0.0:9999/clientes"
 
+func TestResetDB(t *testing.T) {
+	ResetDatabase(t)
+}
+
 func TestIntegration(t *testing.T) {
 	StartStack(t)
 	ResetDatabase(t)
