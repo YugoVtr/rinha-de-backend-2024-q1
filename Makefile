@@ -46,6 +46,9 @@ release:
 integration-test:
 	./scripts/integration-test.sh
 
+load-test:
+	./scripts/load-test.sh
+
 ## Help:
 help: ## Show this help.
 	@echo ''
