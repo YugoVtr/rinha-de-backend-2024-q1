@@ -13,6 +13,7 @@
 		"go.useLanguageServer": true,
 		"gopls": {
 			"formatting.gofumpt": true,
+			"build.buildFlags": ["-tags", "integration"],
 		},
 		"launch": {
 			"version": "0.2.0",
