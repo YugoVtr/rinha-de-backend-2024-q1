@@ -4,3 +4,4 @@ Makefile
 *.yml
 *.md
 *.code-workspace
+Tiltfile

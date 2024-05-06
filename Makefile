@@ -26,7 +26,7 @@ all: help
 ## Build:
 build: ## Build your project and put the output binary in bin/out
 	mkdir -p $(BIN_DIR)
-	$(GOCMD) build -o bin/out/$(BINARY_NAME) .
+	CGO_ENABLED=0 GOOS=linux GOARCH=amd64 $(GOCMD) build -o bin/out/$(BINARY_NAME) .
 
 ## Linting:
 lint: $(TOOLS_DIR)/golangci-lint ## Run linters
@@ -51,6 +51,9 @@ load-test:
 
 restart:
 	./scripts/restart.sh
+
+tilt:
+	tmuxp load ./tmuxp.yml
 
 ## Help:
 help: ## Show this help.

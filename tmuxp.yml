@@ -1,0 +1,7 @@
+session_name: tilt
+windows:
+  - window_name: my-window
+    layout: tiled
+    panes:
+      - tilt up
+      - docker compose stats

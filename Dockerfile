@@ -1,16 +1,6 @@
-FROM golang:1.22-alpine as builder
-
-WORKDIR /go/src/app
-COPY . .
-
-# RUN go mod download
-# RUN go vet -v
-# RUN go test -v
-
-RUN CGO_ENABLED=0 go build -o /go/bin/app
-
-FROM gcr.io/distroless/static-debian12
-
-COPY --from=builder /go/bin/app /
-CMD ["/app"]
-EXPOSE 8080
+FROM alpine
+RUN apk add entr
+RUN mkdir /app
+WORKDIR /app
+COPY bin/out/rinha-de-backend-2024-q1 ./
+CMD ls rinha-de-backend-2024-q1 | entr -rn ./rinha-de-backend-2024-q1
