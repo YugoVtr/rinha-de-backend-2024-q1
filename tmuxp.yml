@@ -1,7 +1,8 @@
 session_name: tilt
 windows:
   - window_name: my-window
-    layout: tiled
+    layout: even-vertical
     panes:
       - tilt up
       - docker compose stats
+      - htop

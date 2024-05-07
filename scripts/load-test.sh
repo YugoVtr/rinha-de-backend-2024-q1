@@ -1,12 +1,6 @@
 #!/usr/bin/bash
 
 # Use este script para executar testes locais
-
-# Need to have the following structure:
-# tools
-# ├── gatling       --> https://repo1.maven.org/maven2/io/gatling/highcharts/gatling-charts-highcharts-bundle/3.10.3/gatling-charts-highcharts-bundle-3.10.3-bundle.zip
-# └── load-test     --> https://github.com/zanfranceschi/rinha-de-backend-2024-q1/tree/main/load-test
-
 TOOLS_DIR="$(pwd)/bin/tools"
 
 export GATLING_HOME=$TOOLS_DIR/gatling
