@@ -47,10 +47,7 @@ func (app App) Transacoes(response http.ResponseWriter, request *http.Request) {
 		return
 	}
 	response.WriteHeader(http.StatusOK)
-	if err := json.NewEncoder(response).Encode(map[string]any{"limite": conta.Limite, "saldo": conta.Saldo}); err != nil {
-		http.Error(response, err.Error(), http.StatusInternalServerError)
-		return
-	}
+	_ = json.NewEncoder(response).Encode(map[string]any{"limite": conta.Limite, "saldo": conta.Saldo})
 }
 
 func (app App) Extrato(response http.ResponseWriter, request *http.Request) {
