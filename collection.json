@@ -1,0 +1,42 @@
+{
+    "clientName": "Thunder Client",
+    "collectionName": "rinha backend 2024 q1",
+    "collectionId": "9707191f-9554-4928-a6cb-f36ebefe6485",
+    "dateExported": "2024-05-07T13:08:43.968Z",
+    "version": "1.2",
+    "folders": [],
+    "requests": [
+        {
+            "_id": "91e30127-7d06-49f7-b380-190f604748b4",
+            "colId": "9707191f-9554-4928-a6cb-f36ebefe6485",
+            "containerId": "",
+            "name": "transacao",
+            "url": "0.0.0.0:9999/clientes/1/transacoes",
+            "method": "POST",
+            "sortNum": 10000,
+            "created": "2024-02-14T10:07:51.525Z",
+            "modified": "2024-05-06T05:09:18.166Z",
+            "headers": [],
+            "body": {
+                "type": "json",
+                "raw": "{\n  \"valor\": 78977,\n  \"tipo\": \"c\",\n  \"descricao\": \"descricao\"\n}",
+                "form": []
+            }
+        },
+        {
+            "_id": "e205735c-dd47-49bd-9c08-46a220d77c87",
+            "colId": "9707191f-9554-4928-a6cb-f36ebefe6485",
+            "containerId": "",
+            "name": "extrato",
+            "url": "0.0.0.0:9999/clientes/1/extrato",
+            "method": "GET",
+            "sortNum": 20000,
+            "created": "2024-02-14T10:34:19.709Z",
+            "modified": "2024-02-17T19:40:04.085Z",
+            "headers": [],
+            "params": [],
+            "tests": []
+        }
+    ],
+    "ref": "-ddikf2ywxzvcyFPay5ejEEdkuw83ItR4WjPVYs8wcG-5BZawnTEfQtFsjrKsXDQJoSzZW-mA4ysANb19cIsGA"
+}
