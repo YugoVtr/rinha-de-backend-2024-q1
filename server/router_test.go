@@ -79,18 +79,18 @@ func TestExtrato(t *testing.T) {
 
 type client struct{}
 
-func (client) Existe(id int64) bool { return id > 0 && id < 6 }
+func (client) Existe(_ context.Context, id int64) bool { return id > 0 && id < 6 }
 
-func (client) Transacao(t entity.Transacao) (entity.Conta, error) {
+func (client) Transacao(_ context.Context, t entity.Transacao) (entity.Conta, error) {
 	if t.ClienteID == 5 {
 		return entity.Conta{}, fmt.Errorf("saldo inconsistente")
 	}
 	return entity.Conta{}, nil
 }
 
-func (c client) Extrato(id int64) (entity.Extrato, error) {
+func (c client) Extrato(ctx context.Context, id int64) (entity.Extrato, error) {
 	extrato := entity.Extrato{UltimasTransacoes: []entity.Transacao{}}
-	if !c.Existe(id) {
+	if !c.Existe(ctx, id) {
 		return extrato, fmt.Errorf("cliente não encontrado")
 	}
 	return extrato, nil

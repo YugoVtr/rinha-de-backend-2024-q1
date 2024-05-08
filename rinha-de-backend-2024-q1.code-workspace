@@ -11,6 +11,7 @@
 		"go.testTimeout": "60s",
 		"go.lintOnSave": "package",
 		"go.useLanguageServer": true,
+		"go.formatTool": "gofumpt",
 		"gopls": {
 			"formatting.gofumpt": true,
 			"build.buildFlags": ["-tags", "integration"],

@@ -23,6 +23,8 @@ dc_resource('api02', labels=["api"])
 
 dc_resource('nginx', labels=["infra"])
 dc_resource('db', labels=["infra"])
+dc_resource('jaeger', labels=["infra"])
+dc_resource('otel-collector', labels=["infra"])
 
 cmd_button('reset',
   argv=['make', 'restart'],

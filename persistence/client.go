@@ -1,12 +1,14 @@
 package persistence
 
 import (
+	"context"
 	"database/sql"
 	"errors"
 	"fmt"
 	"time"
 
 	"github.com/yugovtr/rinha-de-backend-2024-q1/entity"
+	"github.com/yugovtr/rinha-de-backend-2024-q1/tracer"
 )
 
 var cache = map[int64]bool{}
@@ -15,21 +17,45 @@ type Cliente struct {
 	*sql.DB
 }
 
+var trace = tracer.New("persistence")
+
 func NewCliente(db *sql.DB) *Cliente {
 	return &Cliente{db}
 }
 
-func (c *Cliente) Existe(clienteID int64) (exists bool) {
+func (c *Cliente) StartTrace(ctx context.Context, name string, opts ...tracer.SpanOpts) func(err error) {
+	_, span := trace.Start(ctx, name, tracer.GetSpanOpts(opts)...)
+	return func(err error) {
+		if err != nil {
+			span.SetStatus(tracer.SetSpanError(err))
+		}
+		span.End()
+	}
+}
+
+func (c *Cliente) Existe(ctx context.Context, clienteID int64) (exists bool) {
+	var err error
+	callback := c.StartTrace(ctx, "existe", tracer.SpanOpts{"cliente_id": clienteID})
+	defer func() { callback(err) }()
+
 	if v, ok := cache[clienteID]; ok {
 		return v
 	}
 	query := `SELECT EXISTS(SELECT 1 FROM contas WHERE cliente_id=$1)`
-	_ = c.DB.QueryRow(query, clienteID).Scan(&exists)
+	err = c.DB.QueryRow(query, clienteID).Scan(&exists)
 	cache[clienteID] = exists
 	return exists
 }
 
-func (c *Cliente) Transacao(transacao entity.Transacao) (conta entity.Conta, err error) {
+func (c *Cliente) Transacao(ctx context.Context, transacao entity.Transacao) (conta entity.Conta, err error) {
+	callback := c.StartTrace(ctx, "transacao", tracer.SpanOpts{
+		"cliente_id": transacao.ClienteID,
+		"valor":      transacao.Valor,
+		"tipo":       transacao.Tipo,
+		"descricao":  transacao.Descricao,
+	})
+	defer func() { callback(err) }()
+
 	trasaction, err := c.DB.Begin()
 	if err != nil {
 		return entity.Conta{}, fmt.Errorf("erro ao iniciar transação %w", err)
@@ -70,8 +96,11 @@ func (c *Cliente) Transacao(transacao entity.Transacao) (conta entity.Conta, err
 	return novaConta, nil
 }
 
-func (c *Cliente) Extrato(clienteID int64) (entity.Extrato, error) {
-	extrato := entity.Extrato{UltimasTransacoes: []entity.Transacao{}}
+func (c *Cliente) Extrato(ctx context.Context, clienteID int64) (extrato entity.Extrato, err error) {
+	callback := c.StartTrace(ctx, "extrato", tracer.SpanOpts{"cliente_id": clienteID})
+	defer func() { callback(err) }()
+
+	extrato = entity.Extrato{UltimasTransacoes: []entity.Transacao{}}
 	query := `SELECT total, limite FROM contas WHERE cliente_id=$1`
 	if err := c.DB.QueryRow(query, clienteID).Scan(&extrato.Saldo.Saldo, &extrato.Saldo.Limite); err != nil {
 		return extrato, fmt.Errorf("conta não encontrada %w", err)
