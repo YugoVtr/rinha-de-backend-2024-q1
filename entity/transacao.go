@@ -1,6 +1,9 @@
 package entity
 
-import "errors"
+import (
+	"encoding/json"
+	"errors"
+)
 
 var TiposValidosTransacao = map[string]bool{
 	"c": true,
@@ -17,6 +20,11 @@ type Transacao struct {
 
 func (t Transacao) Validar() bool {
 	return t.Descricao != "" && t.Valor > 0 && TiposValidosTransacao[t.Tipo]
+}
+
+func (t Transacao) String() string {
+	b, _ := json.Marshal(t)
+	return string(b)
 }
 
 type Conta struct {

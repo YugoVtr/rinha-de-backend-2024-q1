@@ -19,7 +19,7 @@ RESET  := $(shell tput -Txterm sgr0)
 
 GOLANGCILINT_VERSION = 1.55.2
 
-.PHONY: all test build vendor
+.PHONY: all test build
 
 all: help
 
@@ -27,6 +27,9 @@ all: help
 build: ## Build your project and put the output binary in bin/out
 	mkdir -p $(BIN_DIR)
 	CGO_ENABLED=0 GOOS=linux GOARCH=amd64 $(GOCMD) build -o bin/out/$(BINARY_NAME) .
+
+release: ## Build and push the Docker image
+	$(BUILDX) build -t yugovtr/$(PROJECT_NAME):latest --push .
 
 ## Linting:
 lint: $(TOOLS_DIR)/golangci-lint ## Run linters
@@ -36,24 +39,27 @@ lint: $(TOOLS_DIR)/golangci-lint ## Run linters
 test: ## Run the tests of the project
 	$(GOTEST) -v -race -count=1 ./...
 
+integration-test: ## Run the integration tests of the project
+	./scripts/integration-test.sh
+
+load-test: ## Run the load tests of the project
+	./scripts/load-test.sh
+
 coverage: ## Run the tests of the project and export the coverage
 	$(GOTEST) -cover -covermode=count -coverprofile=profile.cov ./...
 	$(GOCMD) tool cover -func profile.cov
 
-release:
-	$(BUILDX) build -t yugovtr/$(PROJECT_NAME):latest --push .
-
-integration-test:
-	./scripts/integration-test.sh
-
-load-test:
-	./scripts/load-test.sh
-
-restart:
+## Clean:
+restart: ## Restart apps and truncate database
 	./scripts/restart.sh
 
-tilt:
+## App:
+tilt: ## Run Tilt
 	tmuxp load ./tmuxp.yml
+
+download: ## Download the dependencies
+	$(GOCMD) mod vendor
+	./scripts/download-dependencies.sh
 
 ## Help:
 help: ## Show this help.

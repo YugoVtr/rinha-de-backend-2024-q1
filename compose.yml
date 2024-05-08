@@ -1,18 +1,15 @@
-version: "3.5"
-
 services:
   api01: &api
     container_name: api01
     hostname: api01
     image: rinha-backend-image
     environment:
+      - COLLECTOR_URL=collector:4317
+      - SERVICE_NAME=api
       - DB_HOSTNAME=db
       - PORT=3000
     ports:
       - "3000:3000"
-    depends_on:
-      db:
-        condition: service_healthy
     restart: always
     deploy:
       resources:
@@ -25,6 +22,8 @@ services:
     container_name: api02
     hostname: api02
     environment:
+      - COLLECTOR_URL=collector:4317
+      - SERVICE_NAME=api
       - DB_HOSTNAME=db
       - PORT=3001
     ports:
@@ -40,6 +39,7 @@ services:
       - api02
     ports:
       - "9999:9999"
+    restart: always
     deploy:
       resources:
         limits:
@@ -64,6 +64,23 @@ services:
         limits:
           cpus: "0.13"
           memory: "140MB"
+
+  otel-collector:
+    container_name: otel-collector
+    hostname: collector
+    image: otel/opentelemetry-collector-contrib:latest
+    command: ["--config=/etc/otel-collector.yml"]
+    volumes:
+      - ./infra/otel-collector.yml:/etc/otel-collector.yml
+    ports:
+      - 4317:4317
+
+  jaeger:
+    container_name: jaeger
+    image: jaegertracing/all-in-one:latest
+    ports:
+      - "16686:16686"
+    restart: always
 
 networks:
   default:

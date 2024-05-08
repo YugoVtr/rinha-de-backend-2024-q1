@@ -11,8 +11,6 @@ jobs:
     runs-on: ubuntu-20.04
     steps:
       - uses: actions/checkout@master
-      - name: Build
-        run: docker build . -t rinha-de-backend-2024-q1
   test:
     runs-on: ubuntu-20.04
     needs: build
@@ -20,6 +18,14 @@ jobs:
       contents: write
     steps:
     - uses: actions/checkout@v3
+    - name: Setup GO
+      uses: actions/setup-go@v5
+      with:
+        go-version: '1.22.x'
+    - name: Compile
+      run: go build -o bin/out/rinha-de-backend-2024-q1
+    - name: Build
+      run: docker build . -t rinha-backend-image
     - run: docker-compose up -d
     - name: Load test
       run: |
